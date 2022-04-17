@@ -44,6 +44,13 @@ def download_urls_para_arquivo():
 
 def scrapping_dados_urls():
     try:
+        # O que pegar da tela:
+        # Titulo  OK
+        # duracao OK
+        # nota de avaliacao OK
+        # imagem OK
+        # descricao OK
+
         print("scrapping_dados_urls")
         meu_arquivo = open("lista_urls.txt", "r")
         linhas_arquivo = meu_arquivo.readlines()
@@ -53,8 +60,42 @@ def scrapping_dados_urls():
             url = l
             page = requests.get(url)
             soup = BeautifulSoup(page.content, "html.parser")
-            print(soup.find("h1"))
-        #realizar o download utilizando as urls salvas e guardar o que foi baixado em uma pasta
+
+            # titulo
+            titulo_original_div = soup.find('div', class_="sc-94726ce4-3 eSKKHi")
+            if titulo_original_div is not None:
+                for t in titulo_original_div:
+                    if "ul" not in str(t):
+                        titulo = t.text.split(":")
+                        print(titulo[1].strip())
+
+            # duracao
+            div_especificacoes = soup.find('ul', class_="ipc-metadata-list ipc-metadata-list--dividers-none ipc-metadata-list--compact ipc-metadata-list--base")
+            if div_especificacoes is not None:
+                for esp in div_especificacoes:
+                    if "Runtime" in esp.text:
+                        print(esp.text.replace("Runtime", ""))
+
+            #nota avaliacao
+            nota_avaliacao = soup.find('span', class_='sc-7ab21ed2-1 jGRxWM')
+            if nota_avaliacao is not None:
+                print(nota_avaliacao.text)
+
+            #imagem
+            imagem_capa_div = soup.find('div', class_='ipc-media ipc-media--poster-27x40 ipc-image-media-ratio--poster-27x40 ipc-media--baseAlt ipc-media--poster-l ipc-poster__poster-image ipc-media__img')
+            if imagem_capa_div is not None:
+                imagem_tag = imagem_capa_div.find(('img'))
+                print(imagem_tag['src'])
+
+            # descricao
+            descricao = soup.find('span', class_='sc-16ede01-2 gXUyNh')
+            if descricao is not None:
+                print(descricao.text)
+
+
+            print("\n")
+
+        #salvar dados em um arquivo txt dentro de uma pasta
 
     except Exception as e:
         print(e)
