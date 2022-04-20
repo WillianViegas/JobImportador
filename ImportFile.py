@@ -84,6 +84,7 @@ def scrapping_dados_urls():
                     if "Runtime" in esp.text:
                         duracao = esp.text.replace("Runtime", "")
 
+
             #nota avaliacao
             nota_avaliacao = soup.find('span', class_='sc-7ab21ed2-1 jGRxWM')
             if nota_avaliacao is not None:
@@ -101,6 +102,9 @@ def scrapping_dados_urls():
                 filme_descricao = descricao.text
 
             # Montar lista para o arquivo
+            if filme_titulo == "" or filme_descricao == "" or nota == "" :
+                continue
+
             filme_dados = (filme_titulo, filme_descricao, nota, duracao, capa)
             registro = ";".join(filme_dados)
             lista_filmes_dados.append(registro)
@@ -117,16 +121,49 @@ def scrapping_dados_urls():
 
 def importar_dados():
     try:
-        #Instanciar conexao com o MongoDB
-        #Realizar a leitura dos arquivos baixados salvos na pasta
-        #Fazer tratativas nos dados
-        #Salvar os dados válidos no banco
-        #Salvar os dados com erro em um arquivo txt
         print("importar_dados")
+        filebase = "lista_filmes.txt"
+
+
+        #Instanciar conexao com o MongoDB
+        client = MongoClient('mongodb://localhost:27017')
+        db = client['Filmes']
+        col = db['Dados']
+
+        #Realizar a leitura dos arquivos baixados salvos na pasta
+        fileRead = open(filebase, 'r')
+
+        for line in fileRead:
+            texto = line.split(';')
+            print(len(texto))
+            print(texto[0])
+            print(texto[1])
+            print(texto[2])
+            print(texto[3])
+            print(texto[4])
+
+            #Salvar os dados válidos no banco
+            col.insert_many(
+                [
+                    {
+                        "Titulo": texto[0],
+                        "Descricao": texto[1],
+                        "Nota": texto[2],
+                        "Duracao": texto[3],
+                        "Capa": texto[4]
+                    }
+                ]
+            )
+
+            print("Inserido")
+
+        fileRead.close()
+        os.remove(filebase)
     except Exception as e:
+        #Salvar os dados com erro em um arquivo txt
         print(e)
 
 
 # download_urls_para_arquivo()
-scrapping_dados_urls()
+# scrapping_dados_urls()
 importar_dados()
