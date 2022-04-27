@@ -1,0 +1,26 @@
+version: '3.4'
+
+services:
+  importador:
+    image: wviegas/pyimport
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    ports:
+      - "7001:80"
+    networks:
+      - production-network
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    networks:
+      - production-network
+    ports:
+      - "27017:27018"
+    command: mongod --port 27017 --bind_ip 0.0.0.0
+
+networks:
+  production-network:
+      driver: bridge

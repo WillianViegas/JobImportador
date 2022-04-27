@@ -126,7 +126,7 @@ def importar_dados():
 
 
         #Instanciar conexao com o MongoDB
-        client = MongoClient('mongodb://localhost:27017')
+        client = MongoClient('mongodb://jobimportador_mongodb_1')
         db = client['Filmes']
         col = db['Dados']
 
@@ -164,6 +164,6 @@ def importar_dados():
         print(e)
 
 
-# download_urls_para_arquivo()
-# scrapping_dados_urls()
+download_urls_para_arquivo()
+scrapping_dados_urls()
 importar_dados()
